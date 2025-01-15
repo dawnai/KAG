@@ -1,19 +1,19 @@
 #------------project configuration start----------------#
-# use for openie
+
 openie_llm: &openie_llm
   api_key: sk-5628e0dd09de41feb558b655ad409f0f
   base_url: https://api.deepseek.com
   model: deepseek-chat
   type: maas
 
-#use for answer
+
 chat_llm: &chat_llm
   api_key: sk-5628e0dd09de41feb558b655ad409f0f
   base_url: https://api.deepseek.com
   model: deepseek-chat
   type: maas
 
-#use for embedding
+
 vectorize_model: &vectorize_model
   api_key: sk-svefxzzoouzucawpdswgqkodaavgujuzpjcugwkqqwswiclx
   base_url: https://api.siliconflow.cn/v1/
@@ -27,10 +27,10 @@ log:
 
 project:
   biz_scene: default
-  host_addr: http://127.0.0.1:8887 
-  id: "1"
+  host_addr: http://127.0.0.1:8887
+  id: '1'
   language: en
-  namespace: TwoWikiTest #the name of project
+  namespace: TwoWikiTest
 #------------project configuration end----------------#
 
 #------------kag-builder configuration start----------------#
@@ -40,7 +40,8 @@ kag_builder_pipeline:
     type: unstructured_builder_chain # kag.builder.default_chain.DefaultUnstructuredBuilderChain
     extractor:
       type: schema_free_extractor # kag.builder.component.extractor.schema_free_extractor.SchemaFreeExtractor
-      llm: *openie_llm #使用deepseek
+      llm: *openie_llm
+                       #使用deepseek
       ner_prompt:
         type: default_ner # kag.builder.prompt.default.ner.OpenIENERPrompt
       std_prompt:
