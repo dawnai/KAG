@@ -78,6 +78,7 @@ KAG-Builder采用的知识表示如下：
 - 下午停电耽搁了
 - 在windows上部署ollama，显卡是3070，只能跑1B左右的大模型
 - 在开发者模式下开始初始化项目
+- 注册硅基流动账户，申请API_key
 - example_config.yaml文件始终报编码错：
 
 > [!CAUTION]
