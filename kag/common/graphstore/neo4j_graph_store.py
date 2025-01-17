@@ -9,6 +9,10 @@
 # Unless required by applicable law or agreed to in writing, software distributed under the License
 # is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
 # or implied.
+
+
+
+
 import logging
 import re
 import threading
@@ -341,7 +345,11 @@ class Neo4jClient(GraphStore, metaclass=SingletonMeta):
 
             def __repr__(self):
                 return repr(self._number)
-
+        '''
+        这段代码的核心功能是批量生成嵌入向量（Embedding Vectors）并将其填充到节点属性中。
+        具体来说，它通过 EmbeddingVectorManager 类管理和批量处理节点属性中的文本数据，
+        生成对应的嵌入向量，并将这些向量存储到节点的属性中
+        ''' 
         class EmbeddingVectorManager(object):
             def __init__(self):
                 self._placeholders = []

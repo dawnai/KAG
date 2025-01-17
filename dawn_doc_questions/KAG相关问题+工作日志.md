@@ -36,6 +36,28 @@ KAG-Builder采用的知识表示如下：
 
 
 
+### 4、bge-m3在KAG中的哪个流程使用？
+
+通过阅读KAG论文发现一下原文：
+
+> [!TIP]
+>
+> In naive RAG, retrieval is achieved by calculating the similarity (e.g. cosine similarity) between the embeddings of the question and document chunks, where the semantic representation capability of embedding models plays a key role. This mainly includes a sparse encoder (BM25) and a dense retriever (BERT architecture pre-training language models)
+>
+> 在传统RAG中，检索是通过计算**问题和文档块**的嵌入之间的相似度（如余弦相似度）来实现的，其中嵌入模型的语义表示能力起着关键作用。这主要包括稀疏编码器（BM25）和密集检索器（预训练语言模型的 BERT 架构）
+
+可以发现，BGE-M3大模型是用于知识问答的，作用是将用户输入的query转化为embedding 向量，方便后续做向量相似度匹配。
+
+但是这也意味着知识图谱中也应该有**知识的向量存储**，否则也无法进行高效匹配，查看0.5版本的文档（https://openspg.yuque.com/ndx6g9/0.5/yofw66sq5ncerf4i），发现BGE-M3大模型还要用于**生成实体属性的embedding向量**，这样就可以解释通了。
+
+**源码位置：**
+
+在存储时，调用BGE-M3大模型为实体属性生成embedding向量并进行存储：EmbeddingVectorManager(object)类
+
+C:\Users\dawna\Desktop\KAG\kag\common\graphstore\neo4j_graph_store.py
+
+
+
 
 
 
@@ -103,5 +125,14 @@ KAG-Builder采用的知识表示如下：
 
 <img src="C:\Users\dawna\Desktop\KAG\dawn_doc_questions\assets\image-20250115212448506.png" alt="image-20250115212448506" style="zoom:50%;" />
 
+### 1月16日：
 
+1. 去暨南大学参加保密谈话
+2. 李老师给了两本关于知识图谱的书籍，后续阅读一下
+
+### 1月17日：
+
+早上看了一会《工业级知识图谱方法与实践》，了解了一些关于工业级知识图谱的相关知识，重点看了知识融合章节
+
+解决bge-m3在哪里调用的问题。
 
