@@ -4,11 +4,7 @@
 
 ### 1、表示模型和生成模型有什么区别？
 
-感觉是指代openie的信息抽取模型和
-
-
-
-
+感觉是指代openie的信息抽取模型和知识库问答模型
 
 ### 2、KAG-Builder和SPG-Builder有什么区别？
 
@@ -34,7 +30,7 @@ KAG-Builder采用的知识表示如下：
 
 ### 3、KAG的信息抽取效果怎么判断？
 
-
+历史难题咯，这个得根据业务情况具体判断
 
 ### 4、bge-m3在KAG中的哪个流程使用？
 
@@ -58,23 +54,34 @@ C:\Users\dawna\Desktop\KAG\kag\common\graphstore\neo4j_graph_store.py
 
 
 
+### 5、为什么在图谱构建阶段有三个大模型prompt文件？
 
+在builder/prompt文件夹下有三个文件：
 
+```
+├── __init__.py
+├── ner.py
+├── std.py
+└── triple.py
+```
 
+现在依次对三个文件做出解释：
 
+- **ner.py**（用于实体抽取）
 
+ner.py 中定义了**实体抽取的中文、英文模板**，模版以json string 格式呈现，example.input、example.output 分别展示实体抽取阶段大模型的输入示例、输出示例。
 
+- **std.py**（用于实体标准化）
 
+std.py 中定义**实体标准化的中英文模板**，模版以json string 格式呈现，example.input & example.named_entities、example.output 分别展示实体标准化阶段大模型的输入示例、输出示例。
 
+实体标准化依赖大模型对上下文的理解，以及自身的知识储备；标准化的实体名，可补齐实体的上下文，避免歧义。
 
+- **triple.py**（三元组抽取）
 
+triple.py 中定义spo 三元组抽取的中英文模板，模版以json string 格式呈现，example.input & example.entity_list、example.output 分别展示spo 抽取阶段大模型的输入示例、输出示例。
 
-
-
-
-
-
-
+instruction 中要求，spo 抽取结果，其起点 或 终点之一，需要在entity_list 中出现。
 
 
 
@@ -132,7 +139,26 @@ C:\Users\dawna\Desktop\KAG\kag\common\graphstore\neo4j_graph_store.py
 
 ### 1月17日：
 
-早上看了一会《工业级知识图谱方法与实践》，了解了一些关于工业级知识图谱的相关知识，重点看了知识融合章节
+- 早上看了一会《工业级知识图谱方法与实践》，了解了一些关于工业级知识图谱的相关知识，重点 看了知识融合章节 
+- 解决bge-m3在哪里调用的问题。（在知识推理和图谱构建都要使用） 
+- 发现项目名称只能大写开头以及字母和数字组成（后期可以改）。 
+- 开始实验用bge-large-en-v1.5进行向量嵌入，因为业务重点抽取英文文档，采用英文bge也许效果会 好一些（没卵用，因为上下文字符有限制）。
+- 做实验的时候需要删除之前的ckpt日志文件，否则报错。
 
-解决bge-m3在哪里调用的问题。
+### 1月18日：
 
+华农不愧是停水停电大学（停电停水一天）
+
+### 1月20日：
+
+- 吸取前两次经验，prompt的定义可能并不是很好，因为后面发现知识图谱构建阶段有三个prompt文件，我只是更改了其中一个triple.py文件，今天对三个文件的作用进行解释说明：
+
+
+```
+├── __init__.py
+├── ner.py（用于实体抽取）
+├── std.py（用于实体标准化）
+└── triple.py（三元组抽取）
+```
+
+- 学习了官方prompt使用方式，才发现自己之前效果比较差是因为prompt文件根本就没起作用！（图谱构建运行脚本里面的prompt路径没有更改！）

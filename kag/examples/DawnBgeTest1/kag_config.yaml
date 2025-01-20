@@ -43,11 +43,11 @@ kag_builder_pipeline:
       llm: *openie_llm
                        #使用deepseek
       ner_prompt:
-        type: default_ner # kag.builder.prompt.default.ner.OpenIENERPrompt
+        type: dawn_person_ner # kag.builder.prompt.default.ner.OpenIENERPrompt
       std_prompt:
-        type: default_std # kag.builder.prompt.default.std.OpenIEEntitystandardizationdPrompt
+        type: dawn_person_std # kag.builder.prompt.default.std.OpenIEEntitystandardizationdPrompt
       triple_prompt:
-        type: default_triple # kag.builder.prompt.default.triple.OpenIETriplePrompt
+        type: dawn_person_triple # kag.builder.prompt.default.triple.OpenIETriplePrompt
     reader:
       type: dict_reader # kag.builder.component.reader.dict_reader.DictReader
     post_processor:

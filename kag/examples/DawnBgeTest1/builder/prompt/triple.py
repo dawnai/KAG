@@ -11,54 +11,173 @@
 # or implied.
 
 import json
-from typing import Optional, List
+from typing import List
 
 from kag.interface import PromptABC
 
 
-@PromptABC.register("example_medical_triple")
+@PromptABC.register("dawn_person_triple")
 class OpenIETriplePrompt(PromptABC):
-    template_zh = """
+    template_en = """
 {
-    "instruction": "您是一位专门从事开放信息提取（OpenIE）的专家。请从input字段的文本中提取任何可能的关系（包括主语、谓语、宾语），并按照JSON格式列出它们，须遵循example字段的示例格式。请注意以下要求：1. 每个三元组应至少包含entity_list实体列表中的一个，但最好是两个命名实体。2. 明确地将代词解析为特定名称，以保持清晰度。3.尽可能的保持简洁，对于那些重复冗余的实体请不要抽取。比如同义词，同一种类实体的不同表达方式等。4.输入都是英文，但是要求输出的json里面都是中文",
+    "instruction": "You are an expert specializing in carrying out open information extraction (OpenIE). Please extract any possible relations (including subject, predicate, object) from the given text, and list them following the json format {\"triples\": [[\"subject\", \"predicate\",  \"object\"]]}. If there are none, do not list them..Pay attention to the following requirements:- Each triple should contain at least one, but preferably two, of the named entities in the entity_list.- Clearly resolve pronouns to their specific names to maintain clarity.",
     "entity_list": $entity_list,
     "input": "$input",
     "example": {
-        "input": ""Twin Peaks film director David Lynch dies at 78.\n\nDavid Lynch, the American filmmaker whose works include the surrealist cult classics Mulholland Drive and Twin Peaks, has died aged 78.\n\nLynch's death was announced on his official Facebook page by his family on Thursday.\n\n\"There's a big hole in the world now that he's no longer with us,\" the post said.\n\n\"But, as he would say, 'Keep your eye on the donut and not on the hole.'… It's a beautiful day with golden sunshine and blue skies all the way.\"\n\nLynch revealed in August last year he was battling emphysema, a chronic lung disease, from \"many years of smoking\".\n\nConsidered by many a maverick filmmaker, he received three best director Oscar nominations throughout his career for his work on Blue Velvet, The Elephant Man and Mulholland Drive.\n\nHis last major project was Twin Peaks: The Return, which was broadcast in 2017, and continued the TV series that ran for two seasons in the early 1990s.\n\nObituary: Mind-bending director who embraced the weird.\n\n\"David was in tune with the universe and his own imagination on a level that seemed to be the best version of human,\" actor Kyle MacLachlan, who starred in many of Lynch's projects including Twin Peaks, wrote in tribute.\n\n\"He was not interested in answers because he understood that questions are the drive that make us who we are.\"\n\nDescribing Lynch as \"an enigmatic and intuitive man with a creative ocean bursting forth inside of him\", MacLachlan added: \"My world is that much fuller because I knew him and that much emptier now that he's gone.\"\n\nLynch won the prestigious Palme d'Or at the Cannes film festival for Wild at Heart in 1990.\n\n'One of a kind'\n\nThe star of that film, Nicolas Cage, told the BBC World Service's Newshour programme he was one of the main reasons he fell in love with cinema.\n\n\"I used to see his movie Eraserhead in Santa Monica,\" he said. \"He's largely instrumental for why I got into filmmaking. He was one of a kind. He can't be replaced.\"\n\nFellow film director Steven Spielberg said he was a \"singular, visionary dreamer who directed films that felt handmade\".\n\n\"The world is going to miss such an original and unique voice,\" he added in a statement to Variety.\n\nDirector Ron Howard called him a \"gracious man and fearless artist who followed his heart & soul proved that radical experimentation could yield unforgettable cinema\".\n\nMusician Moby, for whom Lynch directed the video for Shot In The Back Of The Head, said he was \"just heartbroken\".\n\nMany of Lynch's films were known for their surrealist, dreamlike quality.\n\nEraserhead, his first major release in 1977, was filled with dark, disturbing imagery.\n\n\"While his imagination clearly has an eye for the viscerally potent, this remains an unremarkable feat by his later standards,\" a BBC reviewer said of the film in 2001.\n\nIn a May 2024 interview with BBC Radio Three's Sound of Cinema, Lynch described the process of working with late composer Angelo Badalamenti, who designed many of the soundscapes that accompanied his vision.\n\n\"And then I say, 'no that's still too fast, it's not dark enough, it's not heavy and foreboding enough,'\" Lynch recalled.\n\nHis body of work was recognised at the Oscars in 2020 when he was given an honorary Academy Award.\n\nThe director said last year that, despite his emphysema diagnosis, he was in \"excellent shape\" and would \"never retire\".\n\nHe added the diagnosis was the \"price to pay\" for his smoking habit.\n\nBut his condition deteriorated within months. In a November interview with People magazine, he said he needed oxygen to walk.\n\nBorn in Missoula, Montana, Lynch first began a career in painting before switching to making short films during the 1960s."",
+        "input": "The RezortThe Rezort is a 2015 British zombie horror film directed by Steve Barker and written by Paul Gerstenberger. It stars Dougray Scott, Jessica De Gouw and Martin McCann. After humanity wins a devastating war against zombies, the few remaining undead are kept on a secure island, where they are hunted for sport. When something goes wrong with the island's security, the guests must face the possibility of a new outbreak.",
         "entity_list": [
-            {"entity": "大卫林奇", "category": "person"},
-            {"entity": "凯尔·麦克拉克伦", "category": "person"},
-            {"entity": "Facebook", "category": "software"},
-            {"entity": "肺气肿", "category": "Disease"},
-            {"entity": "《蓝丝绒》", "category": "opus"},
-            {"entity": "《象人》", "category": "opus"},
-            {"entity": "《穆赫兰道》", "category": "opus"},
-            {"entity": "《双峰》", "category": "opus"},
-            {"entity": "《橡皮头》", "category": "opus"},
-            {"entity": "奥斯卡", "category": "reward"},
-            {"entity": "戛纳电影节", "category": "reward"},
-            {"entity": "蒙大拿州米苏拉", "category": "location"},
-            {"entity": "安杰洛·巴达拉曼蒂", "category": "person"},
-            {"entity": "莫比 (Moby)", "category": "person"},
-            {"entity": "超现实主义", "category": "style"},
-
+            {
+                "name": "The Rezort",
+                "category": "Works"
+            },
+            {
+                "name": "2015",
+                "category": "Others"
+            },
+            {
+                "name": "British",
+                "category": "GeographicLocation"
+            },
+            {
+                "name": "Steve Barker",
+                "category": "Person"
+            },
+            {
+                "name": "Paul Gerstenberger",
+                "category": "Person"
+            },
+            {
+                "name": "Dougray Scott",
+                "category": "Person"
+            },
+            {
+                "name": "Jessica De Gouw",
+                "category": "Person"
+            },
+            {
+                "name": "Martin McCann",
+                "category": "Person"
+            },
+            {
+                "name": "zombies",
+                "category": "Creature"
+            },
+            {
+                "name": "zombie horror film",
+                "category": "Concept"
+            },
+            {
+                "name": "humanity",
+                "category": "Concept"
+            },
+            {
+                "name": "secure island",
+                "category": "GeographicLocation"
+            }
         ],
-        "output":[
-            ["大卫林奇", "去世", "2025年"],
-            ["大卫林奇", "第一部作品", "《橡皮头》"],
-            ["大卫林奇", "指导", "《双峰》"],
-            ["大卫林奇", "被授予", "奥斯卡"],
-            ["大卫林奇", "合作", "安杰洛·巴达拉曼蒂"],
-            ["大卫林奇", "风格", "超现实主义"],
-            ["凯尔·麦克拉克伦", "主演", "《双峰》"],
-            ["大卫林奇", "出生地", "蒙大拿州米苏拉"],
-            ["大卫林奇", "获得", "戛纳电影节"],
+        "output": [
+            [
+                "The Rezort",
+                "is",
+                "zombie horror film"
+            ],
+            [
+                "The Rezort",
+                "publish at",
+                "2015"
+            ],
+            [
+                "The Rezort",
+                "released",
+                "British"
+            ],
+            [
+                "The Rezort",
+                "is directed by",
+                "Steve Barker"
+            ],
+            [
+                "The Rezort",
+                "is written by",
+                "Paul Gerstenberger"
+            ],
+            [
+                "The Rezort",
+                "stars",
+                "Dougray Scott"
+            ],
+            [
+                "The Rezort",
+                "stars",
+                "Jessica De Gouw"
+            ],
+            [
+                "The Rezort",
+                "stars",
+                "Martin McCann"
+            ],
+            [
+                "humanity",
+                "wins",
+                "a devastating war against zombies"
+            ],
+            [
+                "the few remaining undead",
+                "are kept on",
+                "a secure island"
+            ],
+            [
+                "they",
+                "are hunted for",
+                "sport"
+            ],
+            [
+                "something",
+                "goes wrong with",
+                "the island's security"
+            ],
+            [
+                "the guests",
+                "must face",
+                "the possibility of a new outbreak"
+            ]
         ]
     }
 }    
     """
 
-    template_en = template_zh
+    template_zh = """
+{
+    "instruction": "您是一位专门从事开放信息提取（OpenIE）的专家。请从input字段的文本中提取任何可能的关系（包括主语、谓语、宾语），并按照JSON格式列出它们，须遵循example字段的示例格式。请注意以下要求：1. 每个三元组应至少包含entity_list实体列表中的一个，但最好是两个命名实体。2. 明确地将代词解析为特定名称，以保持清晰度。",
+    "entity_list": $entity_list,
+    "input": "$input",
+    "example": {
+        "input": "烦躁不安、语妄、失眠酌用镇静药，禁用抑制呼吸的镇静药。3.并发症的处理经抗菌药物治疗后，高热常在24小时内消退，或数日内逐渐下降。若体温降而复升或3天后仍不降者，应考虑SP的肺外感染，如腋胸、心包炎或关节炎等。治疗：接胸腔压力调节管＋吸引机负压吸引水瓶装置闭式负压吸引宜连续，如经12小时后肺仍未复张，应查找原因。",
+        "entity_list": [
+            {"name": "烦躁不安", "category": "Symptom"},
+            {"name": "语妄", "category": "Symptom"},
+            {"name": "失眠", "category": "Symptom"},
+            {"name": "镇静药", "category": "Medicine"},
+            {"name": "肺外感染", "category": "Disease"},
+            {"name": "胸腔压力调节管", "category": "MedicalEquipment"},
+            {"name": "吸引机负压吸引水瓶装置", "category": "MedicalEquipment"},
+            {"name": "闭式负压吸引", "category": "SurgicalOperation"}
+        ],
+        "output":[
+            ["烦躁不安", "酌用", "镇静药"],
+            ["语妄", "酌用", "镇静药"],
+            ["失眠", "酌用", "镇静药"],
+            ["镇静药", "禁用", "抑制呼吸的镇静药"],
+            ["高热", "消退", "24小时内"],
+            ["高热", "下降", "数日内"],
+            ["体温", "降而复升或3天后仍不降", "肺外感染"],
+            ["肺外感染", "考虑", "腋胸、心包炎或关节炎"],
+            ["胸腔压力调节管", "接", "吸引机负压吸引水瓶装置"],
+            ["闭式负压吸引", "宜连续", "如经12小时后肺仍未复张"]
+        ]
+    }
+}    
+    """
 
     @property
     def template_variables(self) -> List[str]:
