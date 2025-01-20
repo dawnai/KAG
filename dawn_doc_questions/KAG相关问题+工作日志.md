@@ -83,13 +83,48 @@ triple.py 中定义spo 三元组抽取的中英文模板，模版以json string 
 
 instruction 中要求，spo 抽取结果，其起点 或 终点之一，需要在entity_list 中出现。
 
+图谱构建阶段的流程如下：
 
+1. 实体抽取，使用ner_prompt 
+2. 实体标准化，使用std_prompt
+3. 三元组抽取，使用triple_prompt
+4. 将抽取结果汇总成图结构
 
+```python
+class SchemaFreeExtractor(ExtractorABC):
+    """
+    A class for extracting knowledge graph subgraphs from text using a large language model (LLM).
+    Inherits from the Extractor base class.
 
+    Attributes:
+        llm (LLMClient): The large language model client used for text processing.
+        schema (SchemaClient): The schema client used to load the schema for the project.
+        ner_prompt (PromptABC): The prompt used for named entity recognition.
+        std_prompt (PromptABC): The prompt used for named entity standardization.
+        triple_prompt (PromptABC): The prompt used for triple extraction.
+        external_graph (ExternalGraphLoaderABC): The external graph loader used for additional NER.
+    """
 
+    def __init__(
+        self,
+        llm: LLMClient,
+        ner_prompt: PromptABC = None,
+        std_prompt: PromptABC = None,
+        triple_prompt: PromptABC = None,
+        external_graph: ExternalGraphLoaderABC = None,
+    ):
+        """
+        Initializes the KAGExtractor with the specified parameters.
 
+        Args:
+            llm (LLMClient): The large language model client.
+            ner_prompt (PromptABC, optional): The prompt for named entity recognition. Defaults to None.
+            std_prompt (PromptABC, optional): The prompt for named entity standardization. Defaults to None.
+            triple_prompt (PromptABC, optional): The prompt for triple extraction. Defaults to None.
+            external_graph (ExternalGraphLoaderABC, optional): The external graph loader. Defaults to None.
+        """
 
-
+```
 
 
 
@@ -162,3 +197,4 @@ instruction 中要求，spo 抽取结果，其起点 或 终点之一，需要�
 ```
 
 - 学习了官方prompt使用方式，才发现自己之前效果比较差是因为prompt文件根本就没起作用！（图谱构建运行脚本里面的prompt路径没有更改！）
+- 了解了KAG的schema，有点没看懂（自己关于图谱项目经验不多）
