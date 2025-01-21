@@ -375,9 +375,9 @@ template_zh = """
 
 整个图谱精简了很多，但是有明显的错误，为什么抽取成2021年？明明是2025年啊？
 
-怀疑是Schema的时间定义有问题，因为后续并没有继承这个实体。
+怀疑是Schema的时间定义有问题，因为后续并没有继承这个实体（我自己定义的时间）。
 
-- 在Schema中删除Date 实体，在prompt中删除相应的prompt，后再抽取一遍：
+- **在Schema中删除Date 实体，在prompt中删除相应的prompt，后再抽取一遍：**
 
 ![graph (1)](C:\Users\dawna\Desktop\KAG\dawn_doc_questions\assets\graph (1).png)
 
