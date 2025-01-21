@@ -107,7 +107,7 @@ class MusiqueCorpusScanner(ScannerABC):
         """
 
         if os.path.exists(input):
-            with open(input, "r") as f:
+            with open(input, "r",encoding='utf-8') as f:
                 corpus = json.load(f)
         else:
             corpus = json.loads(input)

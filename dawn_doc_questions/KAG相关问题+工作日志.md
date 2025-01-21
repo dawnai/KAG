@@ -198,3 +198,193 @@ class SchemaFreeExtractor(ExtractorABC):
 
 - 学习了官方prompt使用方式，才发现自己之前效果比较差是因为prompt文件根本就没起作用！（图谱构建运行脚本里面的prompt路径没有更改！）
 - 了解了KAG的schema，有点没看懂（自己关于图谱项目经验不多）
+- 学习了KAG_schema的基础语法、语法结构、怎么定义实体类型、概念类型、事件类型。
+
+### 1月21日：
+
+- 从何老师那里获取到了自定义schema,自己再新增了一些，得到以下内容：（**记住第一个首字母大写，否则报错**）
+
+```yaml
+namespace DawnBgeTest1
+
+Chunk(文本块):EntityType
+    properties:
+        content(内容):Text
+            index:TextAndVector
+
+Activity(活动会议):EntityType
+    properties:
+        desc(描述):Text
+        nameEn(名称):Text
+
+Location(地点):EntityType
+    properties:
+        desc(描述):Text
+        nameEn(名字):Text
+
+Date(日期): EntityType
+     properties:
+        desc(描述): Text
+            index: TextAndVector
+        semanticType(语义类型): Text
+            index: Text
+
+NewsArticale(新闻文章):EntityType
+    properties:
+        summary(摘要):Text
+        author(作者):Text
+        title(标题):Text
+        publishTime(发布时间):Text
+
+Others(其他):EntityType
+    properties:
+        desc(描述):Text
+            index:TextAndVector
+        semanticType(语义类型):Text
+            index:Text
+
+Person(人物): EntityType
+     properties:
+        desc(描述): Text
+        nameEn(名字):Text
+        age(年龄):Text
+        participants(参与):Activity
+            constraint:MultiValue
+            properties:
+                time(时间):Text
+        writer(撰写):NewsArticale
+            constraint:MultiValue
+            properties:
+                publishTime(出版时间):Text
+        appear(出现):location
+            constraint:MultiValue
+            properties:
+                time(时间):Text
+```
+
+Schema可视化展示如下：
+
+<img src="C:\Users\dawna\Desktop\KAG\dawn_doc_questions\assets\image-20250121161924894.png" alt="image-20250121161924894" style="zoom:50%;" />
+
+
+
+现在的实体类型就精简很多了，只是针对人物信息进行抽取，相应的，我再将ner.py文件的prompt再改成人物相关的提示：
+
+```
+    template_zh = """
+    {
+        "instruction": "你是命名实体识别的专家。请从输入中提取与模式定义匹配的实体。如果不存在该类型的实体，请返回一个空列表。请以JSON字符串格式回应。你可以参照example进行抽取。",
+        "schema": $schema,
+        "example": [
+            {
+                "input": "特朗普宣布美国将再次退出《巴黎协定》，来源：新华网 | 2025年01月21日 09:12:47。原标题：特朗普宣布美国将再次退出《巴黎协定》新华社华盛顿1月20日电（记者刘亚南 邓仙来）美国总统特朗普20日签署行政令，宣布美国将再次退出旨在应对气候变化的《巴黎协定》。2015年，联合国气候变化大会达成《巴黎协定》，成为全球应对气候变化的重要成果。2017年6月，时任美国总统特朗普宣布美国将退出《巴黎协定》。2020年11月4日，美国正式退出该协定。此举遭到美国国内和国际社会的广泛批评。2021年1月20日，拜登就任总统首日签署行政令，宣布美国将重新加入《巴黎协定》。同年2月19日，美国正式重新加入《巴黎协定》。",
+                "output": [
+                        {"entity": "刘亚楠", "category": "Person"},
+                        {"entity": "邓仙来", "category": "Person"},
+                        {"entity": "特朗普", "category": "Person"},
+                        {"entity": "联合国气候变化大会", "category": "Activity"},
+                        {"entity": "拜登", "category": "Person"},
+                        {"entity": "特朗普宣布美国将再次退出《巴黎协定》", "category": "NewsArticale"},
+                        {"entity": "2025年01月21日", "category": "Date"},
+                        {"entity": "2020年11月4日", "category": "Date"},
+                        {"entity": "2021年1月20日", "category": "Date"},
+                        {"entity": "2017年6月", "category": "Date"}
+                    ]
+            }
+        ],
+        "input": "$input"
+    }    
+        """
+```
+
+于此相对应的triple.py文件内容如下：
+
+```
+template_zh = """
+{
+    "instruction": "您是一位专门从事开放信息提取（OpenIE）的专家。请从input字段的文本中提取任何可能的关系（包括主语、谓语、宾语），并按照JSON格式列出它们，须遵循example字段的示例格式。请注意以下要求：1. 每个三元组应至少包含entity_list实体列表中的一个，但最好是两个命名实体。2. 明确地将代词解析为特定名称，以保持清晰度。",
+    "entity_list": $entity_list,
+    "input": "$input",
+    "example": {
+        "input": "特朗普宣布美国将再次退出《巴黎协定》，来源：新华网 | 2025年01月21日 09:12:47。原标题：特朗普宣布美国将再次退出《巴黎协定》新华社华盛顿1月20日电（记者刘亚南 邓仙来）美国总统特朗普20日签署行政令，宣布美国将再次退出旨在应对气候变化的《巴黎协定》。2015年，联合国气候变化大会达成《巴黎协定》，成为全球应对气候变化的重要成果。2017年6月，时任美国总统特朗普宣布美国将退出《巴黎协定》。2020年11月4日，美国正式退出该协定。此举遭到美国国内和国际社会的广泛批评。2021年1月20日，拜登就任总统首日签署行政令，宣布美国将重新加入《巴黎协定》。同年2月19日，美国正式重新加入《巴黎协定》。",
+        "entity_list": [
+            {"name": "刘亚楠", "category": "Person"},
+            {"name": "邓仙来", "category": "Person"},
+            {"name": "特朗普", "category": "Person"},
+            {"name": "联合国气候变化大会", "category": "Activity"},
+            {"name": "拜登", "category": "Person"},
+            {"name": "特朗普宣布美国将再次退出《巴黎协定》", "category": "NewsArticale"},
+            {"name": "2025年01月21日", "category": "Date"},
+            {"name": "2020年11月4日", "category": "Date"},
+            {"name": "2021年1月20日", "category": "Date"},
+            {"name": "2017年6月", "category": "Date"},
+        ],
+        "output":[
+            ["刘亚楠", "撰写", "特朗普宣布美国将再次退出《巴黎协定》"],
+            ["邓仙来", "撰写", "特朗普宣布美国将再次退出《巴黎协定》"],
+            ["特朗普", "退出", "《巴黎协定》"],
+            ["拜登", "加入", "《巴黎协定》"],
+            ["2017年6月", "退出", "《巴黎协定》"],
+            ["2021年1月20日", "加入", "《巴黎协定"]
+        ]
+    }
+}    
+    """
+```
+
+待抽取数据如下：
+
+```
+特朗普：将在上任后的“几个小时内”推翻拜登多项行政令
+来源：新华网 | 2025年01月20日 09:34:55
+原标题：特朗普：将在上任后的“几个小时内”推翻拜登多项行政令
+　　新华社华盛顿1月19日电（记者熊茂伶）美国候任总统特朗普19日说，他将在20日宣誓就职后的“几个小时内”推翻拜登政府的多项行政令。
+
+　　特朗普19日下午在首都华盛顿特区第一资本体育馆举行的集会上说，拜登政府的每一项“激进而愚蠢”的行政命令，在他宣誓就职后的几小时内都会被废除。他还称，自己的上任将结束“美国衰退的四年”。
+
+　　特朗普表示，他即将签署的行政命令涉及边境安全、能源、联邦政府开支、短视频社交媒体平台TikTok、“多元化、公平与包容”政策等。
+
+　　据美国多家媒体分析，特朗普将在就职当天签署超过100项行政命令。
+
+　　特朗普将于20日中午宣誓就职。由于首都华盛顿特区预计出现严寒天气，他的就职典礼将改为在室内举行。
+```
+
+> [!CAUTION]
+>
+> 报错：
+>
+> UnicodeDecodeError: 'gbk' codec can't decode byte 0xae in position 36: illegal multibyte sequence
+>
+> 还是编码错误，因为使用中文原因，在C:\Users\dawna\Desktop\KAG\kag\builder\component\scanner\dataset_scanner.py中的110行指定utf-8：
+>
+> with open(*input*, "r",*encoding*='utf-8') as f:
+>
+> 何老师这个坑已经帮我踩了，哈哈哈
+
+抽取结果：
+
+```
+{"id": "73280896e15e86572970e120401afc1e0f5078b0d55e48e1365d5ef2daf3a800", "value": {"abstract": {"id": "�����գ��������κ��", "name": "�����գ��������κ��", "content": "�»��绪ʢ��1��19"}, "graph_stat": {"num_nodes": 15, "num_edges": 21, "num_subgraphs": 1}}}
+```
+
+出现了乱码，但这是正常的，因为日志文件是输出不了中文。可以看到实体抽取了15个，边只有21个，这大大降低了知识图谱的冗余。
+
+去neo4j看看：
+
+![graph](C:\Users\dawna\Desktop\KAG\dawn_doc_questions\assets\graph.png)
+
+整个图谱精简了很多，但是有明显的错误，为什么抽取成2021年？明明是2025年啊？
+
+怀疑是Schema的时间定义有问题，因为后续并没有继承这个实体。
+
+- 在Schema中删除Date 实体，在prompt中删除相应的prompt，后再抽取一遍：
+
+![graph (1)](C:\Users\dawna\Desktop\KAG\dawn_doc_questions\assets\graph (1).png)
+
+时间这次是正确的，但是没有了年份，感觉也不是特别好。
+
+有一个想法，大模型本身就自带很多知识，为什么一定要严格按照input文本进行抽取呢？让大模型适当发挥一下其自身的知识库，做一个补充会不会更好？
+
+但是仔细想一想，发现不对，因为KAG后面还有知识问答大模型，到时候让那个大模型参考参考自己的知识库不就好了？builder这一阶段严格抽取input信息就行了。
+
+下一阶段任务就是丰富Schema，然后配套更新prompt。之后就要看reasoner、solver阶段的源码。
