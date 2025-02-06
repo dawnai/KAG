@@ -30,8 +30,8 @@ log:
 
 project:
   biz_scene: default
-  host_addr: http://172.20.239.139:8887 
-  id: "1"
+  host_addr: http://172.20.239.139:8887
+  id: '1'
   language: zh
   namespace: DawnMacTest #the name of project
 #------------project configuration end----------------#
@@ -43,7 +43,8 @@ kag_builder_pipeline:
     type: unstructured_builder_chain # kag.builder.default_chain.DefaultUnstructuredBuilderChain
     extractor:
       type: schema_free_extractor # kag.builder.component.extractor.schema_free_extractor.SchemaFreeExtractor
-      llm: *openie_llm #使用deepseek
+      llm: *openie_llm
+                       #使用deepseek
       ner_prompt:
         type: default_ner # kag.builder.prompt.default.ner.OpenIENERPrompt
       std_prompt:

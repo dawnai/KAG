@@ -388,3 +388,28 @@ template_zh = """
 但是仔细想一想，发现不对，因为KAG后面还有知识问答大模型，到时候让那个大模型参考参考自己的知识库不就好了？builder这一阶段严格抽取input信息就行了。
 
 下一阶段任务就是丰富Schema，然后配套更新prompt。之后就要看reasoner、solver阶段的源码。
+
+### 2月6号
+
+新的一年开始，开工大吉！
+
+首先对去年工作内容进行稳固加强，查看工作日志，了解详细情况，以便后续工作展开
+
+由于新买了mac book air，所以将SPG迁移到macbook上，让其当作服务器使用（校园网没权限指定IP地址，这比较烦）。
+
+在创建知识库的时候遇到问题：
+
+```
+报错：Done initialize project config with host addr http://127.0.0.1:8887 and project_id 1
+No config found.
+Error: invalid vectorizer config: Error code: 503 - {'code': 50505, 'message': 'Model service overloaded. Please try again later.', 'data': None}
+```
+
+这是硅基流动厂商的问题，服务器不够用了，切换成付费的：Pro/BAAI/bge-m3发现还是不行，所以打算用ollama进行本地调用。
+
+后续使用过程中发现DeepSeek响应太慢，导致超时了，看来需要换一个不热门的大模型了，试一试Kimi
+
+KIMI抽取效果和DeepSeek不相上下（也许是因为schema和抽取样例比较简单的原因）
+
+开始进行实验：在抽取样例固定的情况下比较不同prompt和schema的搭配效果。
+

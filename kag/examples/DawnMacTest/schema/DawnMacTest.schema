@@ -1,0 +1,49 @@
+namespace DawnMacTest
+
+Chunk(文本块):EntityType
+    properties:
+        content(内容):Text
+            index:TextAndVector
+
+Activity(活动会议):EntityType
+    properties:
+        desc(描述):Text
+        nameEn(名称):Text
+
+Location(地点):EntityType
+    properties:
+        desc(描述):Text
+        nameEn(名字):Text
+
+NewsArticale(新闻文章):EntityType
+    properties:
+        summary(摘要):Text
+        author(作者):Text
+        title(标题):Text
+        publishTime(发布时间):Text
+
+
+Others(其他):EntityType
+    properties:
+        desc(描述):Text
+            index:TextAndVector
+        semanticType(语义类型):Text
+            index:Text
+
+Person(人物): EntityType
+     properties:
+        desc(描述): Text
+        nameEn(名字):Text
+        age(年龄):Text
+        participants(参与):Activity
+            constraint:MultiValue
+            properties:
+                time(时间):Text
+        writer(撰写):NewsArticale
+            constraint:MultiValue
+            properties:
+                publishTime(出版时间):Text
+        appear(出现):Location
+            constraint:MultiValue
+            properties:
+                time(时间):Text
