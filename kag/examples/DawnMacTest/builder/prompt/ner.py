@@ -23,7 +23,7 @@ class OpenIENERPrompt(PromptABC):
  
     template_zh = """
     {
-        "instruction": "你是命名实体识别的专家。请从输入中提取与模式定义匹配的实体。如果不存在该类型的实体，请返回一个空列表。请尽可能严格schema中的实体内容进行抽取，保持知识图谱的准确性和精简性。并且以JSON字符串格式回应。你可以参照example进行抽取。",
+        "instruction": "你是命名实体识别的专家。请从输入中提取与模式定义（schema）匹配的实体。请尽严格按照schema中的内容进行抽取，保持知识图谱的准确性和精简性。并且相同的实体只需要提取一次（因为人名、地名可能有别称，你需要识别这些别称，然后只提取一次同概念实体，比如川普、特朗普、唐纳德特朗普其实都是指美国总统特朗普，你只需要提取唐纳德特朗普即可）。然后以JSON字符串格式回应。你可以参照example进行抽取。",
         "schema": $schema,
         "example": [
             {
@@ -31,10 +31,9 @@ class OpenIENERPrompt(PromptABC):
                 "output": [
                         {"entity": "刘亚楠", "category": "Person"},
                         {"entity": "邓仙来", "category": "Person"},
-                        {"entity": "特朗普", "category": "Person"},
+                        {"entity": "唐纳德特朗普", "category": "Person"},
                         {"entity": "联合国气候变化大会", "category": "Activity"},
-                        {"entity": "拜登", "category": "Person"},
-                        {"entity": "特朗普宣布美国将再次退出《巴黎协定》", "category": "NewsArticale"}
+                        {"entity": "拜登", "category": "Person"}
                     ]
             }
         ],

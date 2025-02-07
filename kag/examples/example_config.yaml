@@ -33,7 +33,7 @@ project:
   host_addr: http://172.20.239.139:8887 
   id: "1"
   language: zh
-  namespace: DawnMacTest #the name of project
+  namespace: DawnMacSchema #the name of project
 #------------project configuration end----------------#
 
 #------------kag-builder configuration start----------------#

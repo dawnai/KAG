@@ -1,0 +1,62 @@
+namespace DawnMacSchema
+
+Activity(活动会议):EntityType
+    properties:
+        desc(描述):Text
+        nameEn(名称):Text
+
+Location(地点):EntityType
+    properties:
+        desc(描述):Text
+        nameEn(名字):Text
+
+NewsArticale(新闻文章):EntityType
+    properties:
+        summary(摘要):Text
+        author(作者):Text
+        title(标题):Text
+        publishTime(发布时间):Text
+
+Person(人物): EntityType
+     properties:
+        info(信息): Text
+            index: TextAndVector
+        semanticType(语义类型): Text
+            index: Text
+        job(工作): Text
+            constraint: MultiValue
+
+Date(日期): EntityType
+     properties:
+        info(信息): Text
+            index: TextAndVector
+        semanticType(语义类型): Text
+            index: Text
+
+BaikeEvent(事件): EventType
+     properties:
+        subject(主体): Person
+        participants(参与者): Person
+            desc: the participants of event, such as subject and objects
+            constraint: MultiValue
+        time(时间): Date            
+        location(地点): Location
+        abstract(摘要): Text
+            index: TextAndVector        
+        semanticType(事件语义类型): Text
+            desc: a more specific and clearly defined type, such as Professor or Actor for the Person type
+            index: Text
+
+Organization(组织机构): EntityType
+     properties:
+        info(信息): Text
+            index: TextAndVector
+        semanticType(语义类型): Text
+            index: Text
+
+Chunk(文本块): EntityType
+     desc: A chunk refers to a segment of text.
+     properties:
+        content(内容): Text
+          index: TextAndVector
+

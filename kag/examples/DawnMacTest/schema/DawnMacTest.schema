@@ -1,9 +1,5 @@
 namespace DawnMacTest
 
-Chunk(文本块):EntityType
-    properties:
-        content(内容):Text
-            index:TextAndVector
 
 Activity(活动会议):EntityType
     properties:
@@ -21,14 +17,6 @@ NewsArticale(新闻文章):EntityType
         author(作者):Text
         title(标题):Text
         publishTime(发布时间):Text
-
-
-Others(其他):EntityType
-    properties:
-        desc(描述):Text
-            index:TextAndVector
-        semanticType(语义类型):Text
-            index:Text
 
 Person(人物): EntityType
      properties:
