@@ -6,7 +6,7 @@ Activity(活动会议):EntityType
         desc(描述):Text
         nameEn(名称):Text
 
-Location(九龙地点):EntityType
+Location(地点):EntityType
     properties:
         desc(描述):Text
         nameEn(名字):Text

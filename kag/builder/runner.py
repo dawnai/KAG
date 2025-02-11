@@ -157,6 +157,11 @@ class BuilderChainRunner(Registrable):
         print(f"Processing {input}")
         success = 0
         try:
+            """
+                scanner.generate(input) 生成输入数据项，并为每个数据项生成唯一的 item_id 
+                和 item_abstract。如果 item_id 已经存在于检查点中，则跳过该数据项。
+                否则，将数据项提交到线程池中执行，并将返回的 Future 对象添加到 futures 列表中
+                """
             with ThreadPoolExecutor(self.num_chains) as executor:
                 for item in self.scanner.generate(input):
                     item_id, item_abstract = generate_hash_id_and_abstract(item)
@@ -170,6 +175,10 @@ class BuilderChainRunner(Registrable):
                     )
                     futures.append(fut)
 
+                """
+                使用 tqdm 显示处理进度。对于每个完成的 Future，获取处理结果并更新统计信息（如节点数、边数、子图数等）。
+                如果处理成功，将结果写入检查点，并增加成功计数器 success
+                """
                 success = 0
                 for future in tqdm(
                     as_completed(futures),

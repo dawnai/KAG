@@ -799,3 +799,298 @@ template_zh = """
 4、schema_free_extractor相比起Schema_Constraint_Extractor好用，主要原因是目前schema还不够完善，需要大模型发挥自身的知识库进行补充
 
 5、明天按照已知问题进行改进。
+
+
+
+## 2月10号
+
+抽取刘博给出的实际新闻样例，因为是xlsx文件，所以不能直接进行抽取，需要转换成其他文件。
+
+最开始转化成txt，发现效果不好，最终换成csv文件，但是由于体量太大，单个文件一瞬间抽取1k多实体，所以需要对样例进行删改。
+
+同时昨天大部分时间花在dify部署问题上，所以只进行了一次实验。
+
+## 2月11号
+
+### 实验一
+
+吸取昨天的经验，将待抽取样例删改至10条新闻：
+
+![image-20250211150724748](C:\Users\dawna\Desktop\KAG\dawn_doc_questions\assets\image-20250211150724748.png)
+
+转化为csv后，试着抽取一下，然后报错：
+
+```
+Done process 10 records, with 0 successfully processed and 10 failures encountered.
+The log file is located at ckpt\kag_checkpoint_0_1.ckpt. Please access this file to obtain detailed task statistics.
+```
+
+没有一条成功？
+
+主要报错如下：
+
+```
+TypeError: kag.builder.model.chunk.Chunk() got multiple values for keyword argument 'id
+```
+
+删除kag_config.yaml文件中reader下面的content_col: text   id_col: idx    name_col: title 参数。
+
+---
+
+然后再执行一遍：
+
+结果：
+
+```
+Done process 10 records, with 9 successfully processed and 1 failures encountered.
+The log file is located at ckpt\kag_checkpoint_0_1.ckpt. Please access this file to obtain detailed task statistics.
+```
+
+成功了9个，然后有一条抽取失败，查看抽取失败的信息：
+
+```
+openai.BadRequestError: Error code: 400 - {'error': {'code': 'data_inspection_failed', 'param': None, 'message': 'Input data may contain inappropriate content.', 'type': 'data_inspection_failed'}}
+```
+
+看来是Qwen 2.5 检测到输入数据违反了相关规定，拒绝给出答复，新闻中可能具备暴力、血腥元素。
+
+再看一下抽取效果：
+
+```shell
+{"num_nodes": 25, "num_edges": 36, "num_subgraphs": 1}}}
+{"num_nodes": 45, "num_edges": 66, "num_subgraphs": 1}}}
+{"num_nodes": 27, "num_edges": 40, "num_subgraphs": 1}}}
+{"num_nodes": 19, "num_edges": 28, "num_subgraphs": 1}}}
+{"num_nodes": 33, "num_edges": 49, "num_subgraphs": 1}}}
+{"num_nodes": 21, "num_edges": 31, "num_subgraphs": 1}}}
+{"num_nodes": 34, "num_edges": 52, "num_subgraphs": 1}}}
+{"num_nodes": 67, "num_edges": 100, "num_subgraphs": 1}}}
+{"num_nodes": 33, "num_edges": 49, "num_subgraphs": 1}}}
+```
+
+![graph (18)](C:\Users\dawna\Desktop\KAG\dawn_doc_questions\assets\graph (18)-1739260556905-2.svg)
+
+问题也是很明显，一眼看过去全是粉红色实体，这意味着大模型只抽取了Others实体，地名、任务、事件实体那是一个都没有抽取。当然，这也和新闻材料相关，我仔细看了那10个例子，是存在大量人名、地名、还有事件的。
+
+推测可能是Qwen 2.5 72B不太够用，切换成千亿大模型KIMI试试看
+
+### 实验二：
+
+切换成千亿大模型Kimi后，结果如下：
+
+```
+Done process 10 records, with 7 successfully processed and 3 failures encountered.
+```
+
+成功了7条，失败3条
+
+主要错误如下：
+
+```
+openai.BadRequestError: Error code: 400 - {'error': {'code': 400, 'message': 'The request was rejected because it was considered high risk', 'param': 'prompt', 'type': 'content_filter', 'innererror': {}}}
+
+json.decoder.JSONDecodeError: Expecting value: line 4 column 13 (char 40)
+json.decoder.JSONDecodeError: Unterminated string starting at: line 2 column 14 (char 15)
+```
+
+一个是Kimi大模型检测到有害内容拒绝回答，另一个是回答的JSON格式有误。由此可见，Kimi的安全审查机制要避Qwen 2.5 更加严格
+
+查看抽取结果：
+
+```
+{"num_nodes": 19, "num_edges": 27, "num_subgraphs": 1}}}
+{"num_nodes": 33, "num_edges": 49, "num_subgraphs": 1}}}
+{"num_nodes": 25, "num_edges": 37, "num_subgraphs": 1}}}
+{"num_nodes": 33, "num_edges": 49, "num_subgraphs": 1}}}
+{"num_nodes": 35, "num_edges": 52, "num_subgraphs": 1}}}
+{"num_nodes": 37, "num_edges": 55, "num_subgraphs": 1}}}
+{"num_nodes": 52, "num_edges": 79, "num_subgraphs": 1}}}
+
+```
+
+![graph (19)](C:\Users\dawna\Desktop\KAG\dawn_doc_questions\assets\graph (19).svg)
+
+同样的问题，几乎所有的实体全部被抽取为Others，这次证明不是Qwen2.5的事，而是prompt和schema
+
+### 实验三：
+
+重写prompt：
+
+```
+template_zh = """
+    {
+        "instruction": "你是命名实体识别的专家。现在你需要从香港新闻媒体中提取与模式定义匹配的实体。如果不存在该类型的实体，请返回一个空列表。你需要重点抽取事件实体，因为本次项目属于舆情项目。请注意！部分新闻可能带有刑事案件，这属于重大社会事故，需要重点抽取！请以JSON字符串格式回应。你可以参照example进行抽取",
+        "schema": $schema,
+        "example": [
+            {
+                "input": "消拯搜救人员于8日在河中寻获45岁的巫裔男子遗体。又一宗坠河溺毙案，这已是今年开年以来,亚罗士打第3宗坠河溺毙事件。该坠河溺毙事件是于周三（8日）在亚罗士打甘榜哥里基斯拿督坤峇路一带的河流发生，死者是约45岁的巫裔男子。吉打州消拯局高级主任阿末阿米努丁指出，消拯局于周三下午3时04分接获有一名男子坠河后下落不明，派员到场展开搜寻行动。消拯人员把死者遗体抬上车以便送往亚罗士打太平间。他说，搜救人员于当天下午6时42分潜入人中寻人，直到下午6时58分寻获死者，遗体交给警方处理，搜寻行动于晚上7时25分结束行动。今年开年隔天即1月2日，在太子路过港海墘街蓝卓公附近的河边，发生一起28岁华青黄伟宏疑癫痫症发作，脱掉上衣与裤子只身穿一条内裤往草丛的河边跑去而失去踪影，直到隔天（1月3日） 上午9时51分，在距离400米处的丹绒查里河畔处寻获其遗体搁浅在河岸旁。第2宗坠河溺毙案是发生在1月5日，一名45岁印裔男子于当天中午约12时，在米都拉惹路桥的丹绒查理河畔坠河，死者遗体于当天下午4时10分寻获。",
+                "output": [
+                            {
+                                "name": "消拯搜救人员于8日在河中寻获45岁的巫裔男子遗体",
+                                "type": "JiuLongEvent",
+                                "category": "JiuLongEvent",
+                                "description": "一宗坠河溺毙案"
+                            },
+                            {
+                                "name": "港海墘街蓝卓公附近的河边，发生一起28岁华青黄伟宏疑癫痫症发作",
+                                "type": "JiuLongEvent",
+                                "category": "JiuLongEvent",
+                                "description": "另一宗案件"
+                            },
+                            {
+                                "name": "一名45岁印裔男子于当天中午约12时，在米都拉惹路桥的丹绒查理河畔坠河",
+                                "type": "JiuLongEvent",
+                                "category": "JiuLongEvent",
+                                "description": "第二宗坠河溺毙案"
+                            },
+                            {
+                                "name": "周三（8日）",
+                                "type": "Date",
+                                "category": "Date",
+                                "description": "坠河溺毙案事件发生时间"
+                            },
+                            {
+                                "name": "亚罗士打",
+                                "type": "Location",
+                                "category": "Location",
+                                "description": "亚罗士打发生3宗坠河溺毙事件，该坠河溺毙事件是于周三（8日）在亚罗士打甘榜哥里基斯拿督坤峇路一带的河流发生"
+                            },
+                            {
+                                "name": "亚罗士打甘榜哥里基斯拿督坤峇路",
+                                "type": "Location",
+                                "category": "Location",
+                                "description": "坠河溺毙案发生的详细地址"
+                            },
+                            {
+                                "name": "巫裔男子",
+                                "type": "Person",
+                                "category": "Person",
+                                "description": "坠河溺毙案发生的受害者"
+                            },
+                            {
+                                "name": "吉打州消拯局",
+                                "type": "Organization",
+                                "category": "Organization",
+                                "description": "负责调查坠河溺毙案的组织"
+                            },
+                            {
+                                "name": "阿末阿米努丁",
+                                "type": "Person",
+                                "category": "Person",
+                                "description": "吉打州消拯局高级主任,负责调查此事件"
+                            },                          
+                            {
+                                "name": "周三下午3时04分",
+                                "type": "Date",
+                                "category": "Date",
+                                "description": "报警时间"
+                            },
+                            {
+                                "name": "下午6时42分",
+                                "type": "Date",
+                                "category": "Date",
+                                "description": "开始潜入水中找人"
+                            },
+                            {
+                                "name": "晚上7时25分",
+                                "type": "Date",
+                                "category": "Date",
+                                "description": "搜寻结束"
+                            },
+                            {
+                                "name": "1月2日",
+                                "type": "Date",
+                                "category": "Date",
+                                "description": "另一宗案件发生时间，华青黄伟宏疑癫痫症发作"
+                            },
+                            {
+                                "name": "港海墘街蓝卓公",
+                                "type": "Location",
+                                "category": "Location",
+                                "description": "华青黄伟宏疑癫痫症发作地点"
+                            },
+                            {
+                                "name": "（1月3日） 上午9时51分",
+                                "type": "Date",
+                                "category": "Date",
+                                "description": "华青黄伟宏遗体被发现时间"
+                            },
+                            {
+                                "name": "距离400米处的丹绒查里河畔处",
+                                "type": "Location",
+                                "category": "Location",
+                                "description": "华青黄伟宏遗体被发现地点"
+                            },
+                            {
+                                "name": "1月5日",
+                                "type": "Date",
+                                "category": "Date",
+                                "description": "第二宗坠河溺毙案发生时间"
+                            },
+                            {
+                                "name": "45岁印裔男子",
+                                "type": "Person",
+                                "category": "Person",
+                                "description": "第二宗坠河溺毙案的受害者"
+                            },
+                            {
+                                "name": "米都拉惹路桥的丹绒查理河畔",
+                                "type": "Location",
+                                "category": "Location",
+                                "description": "第二宗坠河溺毙案的发生地"
+                            },
+                            {
+                                "name": "下午4时10分",
+                                "type": "Date",
+                                "category": "Date",
+                                "description": "第二宗坠河溺毙案受害人遗体被发现时间"
+                            },
+
+                        ]
+            }
+        ],
+        "input": "$input"
+    }    
+        """
+```
+
+然后将模型切换成Qwen 2.5 72B
+
+结果如下：
+
+![graph (20)](C:\Users\dawna\Desktop\KAG\dawn_doc_questions\assets\graph (20).svg)
+
+完全没有用！奇怪了，不应该啊？不科学啊？
+
+### 实验四：
+
+仔细检查了一下终端的输出，发现我prompt好像重复了？今天为了方便起见，我存了一份繁体新闻的prompt，并且在同一文件夹下，只是改了文件名而已。
+
+将繁体prompt文件转移到其他文件夹后，再进行一遍抽取:
+
+![graph (22)](C:\Users\dawna\Desktop\KAG\dawn_doc_questions\assets\graph (22).svg)
+
+开始有了人物、事件、地点实体了！
+
+事件实体如下：
+
+<img src="C:\Users\dawna\Desktop\KAG\dawn_doc_questions\assets\graph (23).svg" alt="graph (23)" style="zoom:67%;" />
+
+但是有两条样例，仍然抽取了很多Others？其中一条属于养生的科普新闻，另外一条是英文的新闻：美国比特币矿工正在积累大量加密货币储备，以帮助他们抵御日益激烈的资源竞争所带来的利润空间不断压缩。
+
+科普的那个被抽取Other可以理解，因为很多名词在schema中并没有提到，但是关于美国的这个新闻就不太应该了。
+
+并且还有好几个样例都抽取失败了。
+
+### 实验五：
+
+![graph (24)](C:\Users\dawna\Desktop\KAG\dawn_doc_questions\assets\graph (24).svg)
+
+对prompt再次微调一下，结果任然如此。
+
+总结：
+
+1. 大模型每次抽取结果具有一定的随机性
+2. 对于某些含有暴力血腥类词汇的新闻媒体，大模型会拒绝回答
+3. 大模型返回的JSON文件有时候会不符合要求
+4. csv文档不一定是最好的xlsx的转换格式，后续还可以试一试其他格式

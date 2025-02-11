@@ -424,3 +424,81 @@ kimi需要收费才能使用了（氪金）
 持续推进prompt实验，将实验方向改为香港舆情监控，模型更改为Qwen2.5 72B 采用阿里云API
 
 想把实体抽取偏向限制在香港地区，但是失败。
+
+### 2月10号：
+
+1、查看源码，寻找大模型实体抽取部分的源码。
+
+2、在Mac上部署Dify，总是遇到镜像拉取问题:
+
+```shell
+[+] Running 9/9
+ ✘ worker Error                                                            3.2s
+ ✘ redis Error                                                             3.2s
+ ✘ sandbox Error                                                           3.2s
+ ✘ web Error                                                               3.2s
+ ✘ db Error                                                                3.2s
+ ✘ api Error                                                               3.2s
+ ✘ weaviate Error                                                          3.2s
+ ✘ ssrf_proxy Error                                                        3.2s
+ ✘ nginx Error                                                             3.2s
+Error response from daemon: Get "https://registry-1.docker.io/v2/": EOF
+```
+
+在mac和windows都遇到了相同的问题。真烦心！防火墙、docker登录、docker权限、国内镜像、梯子，能做的都做了，还是不行。
+
+后面远程朋友的电脑，利用公司的网络拉取，总算是拉下来了，然后用离线镜像命令安装了dify
+
+虽然兜兜转转部署成功了dify，但是后续还要拉镜像岂不是太麻烦？在查看了大量docker的经验贴后，发现需要配置docker engine即可：
+
+```json
+{
+  "builder": {
+    "gc": {
+      "defaultKeepStorage": "20GB",
+      "enabled": true
+    }
+  },
+  "experimental": false,
+  "features": {
+    "buildkit": true
+  },
+  "registry-mirrors": [
+    "https://dockerpull.org",
+    "https://docker.1panel.dev",
+    "https://docker.foreverlink.love",
+    "https://docker.fxxk.dedyn.io",
+    "https://docker.xn--6oq72ry9d5zx.cn",
+    "https://docker.zhai.cm",
+    "https://docker.5z5f.com",
+    "https://a.ussh.net",
+    "https://docker.cloudlayer.icu",
+    "https://hub.littlediary.cn",
+    "https://hub.crdz.gq",
+    "https://docker.unsee.tech",
+    "https://docker.kejilion.pro",
+    "https://registry.dockermirror.com",
+    "https://hub.rat.dev",
+    "https://dhub.kubesre.xyz",
+    "https://docker.nastool.de",
+    "https://docker.udayun.com",
+    "https://docker.rainbond.cc",
+    "https://hub.geekery.cn",
+    "https://docker.1panelproxy.com",
+    "https://atomhub.openatom.cn",
+    "https://docker.m.daocloud.io",
+    "https://docker.1ms.run",
+    "https://docker.linkedbus.com"
+  ]
+}
+```
+
+我之间只加了一个镜像，网上这篇攻略几乎把所有国内镜像都加入了，这次就可以顺利拉取了。
+
+![image-20250210161545645](C:\Users\dawna\Desktop\KAG\dawn_doc_questions\assets\image-20250210161545645.png)
+
+3、使用刘博给出的实际新闻数据进行实验
+
+因为是xlsx文件，目前KAG是不支持该文件的读取的，可以改为csv文件，同时修改配置文件kag_config.yaml，将其中的scanner改为csv_scanner.
+
+执行的时候报了一堆错，同时数据太大了，一瞬间就抽取了1k多实体，明天将新闻内容大幅减少，然后再修改报错
