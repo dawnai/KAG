@@ -512,7 +512,7 @@ Error response from daemon: Get "https://registry-1.docker.io/v2/": EOF
 
 ### 2月12日
 
-去暨大开会，讨论香港九龙项目，同时请教何老师KAG相关问题，根据何老师提示测试HanLP项目
+去暨大开会，讨论香港九龙项目，同时请教何老师KAG相关问题，根据何老师安排，测试HanLP项目（神经网络的NLP）
 
 ### 2月13日
 
@@ -543,3 +543,21 @@ Error response from daemon: Get "https://registry-1.docker.io/v2/": EOF
 
 4. 后期可以将命名实体识别功能集成在KAG中，在实体抽取那一部分替换成HanLP，这样速度会快很多，大模型只需要负责实体对齐和关系抽取即可。
 
+### 2月14日
+
+1、测试HanLP单任务模型的命名实体抽取功能，引入多种分词模型，测试那种搭配效果比较好。
+
+2、COARSE_ELECTRA_SMALL_ZH分词模型和MSRA_NER_ELECTRA_SMALL_ZH实体抽取模型的搭配效果比较好。
+
+### 2月15-2月16（周六周天休息）
+
+### 2月17日
+
+1. 查看KAG实体抽取部分的源码extractor
+2. 重写extractor，将上周的COARSE_ELECTRA_SMALL_ZH模型+MSRA_NER_ELECTRA_SMALL_ZH模型集成进KAG，替代原有KAG的实体抽取部分代码。
+3. 移植完成后，进行新闻样例的命名实体抽取测试，由于上述两个模型是传统的神经网络模型，所以自定义的Schema不可用，只能用他们之前训练的词典msra，实验结果证明，像新闻这种比较复杂的样例，用传统的NLP效果并不是很好。
+4. 对extractor源码进行拆解，撰写extractor函数详细说明：
+
+![image-20250217170207977](./assets/image-20250217170207977.png)
+
+5、源码拆分完后，发现了KAG还是有很多可以改进的地方，比如实体去重（根据刘博的建议可以再提交一遍给大模型）、还有为什么会产生大量Other实体（在构造图谱的那部分会检测该实体是否存在于Schema中，如果没有，就自动生成Other实体）

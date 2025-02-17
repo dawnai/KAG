@@ -14,6 +14,7 @@ from kag.builder.component.external_graph.external_graph import (
     DefaultExternalGraphLoader,
 )
 from kag.builder.component.extractor.schema_free_extractor import SchemaFreeExtractor
+from kag.builder.component.extractor.schema_Dawn_extractor import SchemaDawnExtractor
 from kag.builder.component.extractor.schema_constraint_extractor import (
     SchemaConstraintExtractor,
 )
@@ -55,6 +56,7 @@ from kag.builder.component.writer.kg_writer import KGWriter
 __all__ = [
     "DefaultExternalGraphLoader",
     "SchemaFreeExtractor",
+    "SchemaDawnExtractor",
     "SchemaConstraintExtractor",
     "KAGAligner",
     "SPGAligner",

@@ -421,9 +421,154 @@ ner.dict_blacklist = {'1','2','3','4','5','6','7','8','9','一'}
 [['深圳', '南山', '今日', '（', '8日', '）', '發生', '巴士', '撞', '上', '巴士站', '，', '事後', '釀成', '2', '死', '1', '傷', '。', '深圳', '公安', '通報', '事件', '。', '通報', '指出', '，', '2月8日', '10時', '許', '，', '在', '南山區', '沙河西路', '茶光村公交站', '，', '一', '公交', '車', '入', '站', '停靠', '時', '因', '司機', '突發', '疾病', '與', '站台', '發生', '碰撞', '，', '造成', '3名', '候車', '乘客', '受傷', '，', '其中', '2', '人', '經', '搶救', '無效', '死亡', '。', '經', '對', '公交', '車', '司機', '進行', '呼氣', '式', '酒精', '測試', '，', '結果', '為', '0mg', '/', '100ml', '。', '目前', '，', '事故', '正在', '進一步', '調查', '處理']]
 ```
 
-感觉还是COARSE_ELECTRA_SMALL_ZH表现好一些，现在结合MSRA_NER_ELECTRA_SMALL_ZH命名实体识别模型试一试：
+感觉还是**COARSE_ELECTRA_SMALL_ZH**表现好一些，现在结合**MSRA_NER_ELECTRA_SMALL_ZH**命名实体识别模型试一试：
 
 ```shell
 [[('深圳', 'LOCATION', 0, 1), ('南山', 'LOCATION', 1, 2), ('今日', 'DATE', 2, 3), ('8日', 'DATE', 4, 5), ('2', 'INTEGER', 14, 15), ('深圳', 'LOCATION', 19, 20), ('2月8日', 'DATE', 27, 28), ('10時', 'TIME', 28, 29), ('南山區', 'LOCATION', 32, 33), ('沙河西路', 'LOCATION', 33, 34), ('茶光村公交站', 'LOCATION', 34, 35), ('3名', 'INTEGER', 52, 53), ('2', 'INTEGER', 58, 59), ('0mg/100ml', 'MEASURE', 76, 77)]]
 ```
+
+感觉还行，达到了多任务模型的水准。
+
+### 实验二：多样例实验
+
+一个样本不够，现在进行多样本实验：
+
+```
+[
+'深圳南山今日（8日）發生巴士撞上巴士站，事後釀成2死1傷。深圳公安通報事件。通報指出，2月8日10時許，在南山區沙河西路茶光村公交站，一公交車入站停靠時因司機突發疾病與站台發生碰撞，造成3名候車乘客受傷，其中2人經搶救無效死亡。經對公交車司機進行呼氣式酒精測試，結果為0mg/100ml。目前，事故正在進一步調查處理',
+
+'消拯搜救人员于8日在河中寻获45岁的巫裔男子遗体。又一宗坠河溺毙案，这已是今年开年以来,亚罗士打第3宗坠河溺毙事件。该坠河溺毙事件是于周三（8日）在亚罗士打甘榜哥里基斯拿督坤峇路一带的河流发生，死者是约45岁的巫裔男子。吉打州消拯局高级主任阿末阿米努丁指出，消拯局于周三下午3时04分接获有一名男子坠河后下落不明，派员到场展开搜寻行动。消拯人员把死者遗体抬上车以便送往亚罗士打太平间。他说，搜救人员于当天下午6时42分潜入人中寻人，直到下午6时58分寻获死者，遗体交给警方处理，搜寻行动于晚上7时25分结束行动。今年开年隔天即1月2日，在太子路过港海墘街蓝卓公附近的河边，发生一起28岁华青黄伟宏疑癫痫症发作，脱掉上衣与裤子只身穿一条内裤往草丛的河边跑去而失去踪影，直到隔天（1月3日） 上午9时51分，在距离400米处的丹绒查里河畔处寻获其遗体搁浅在河岸旁。第2宗坠河溺毙案是发生在1月5日，一名45岁印裔男子于当天中午约12时，在米都拉惹路桥的丹绒查理河畔坠河，死者遗体于当天下午4时10分寻获。',
+
+'台灣台中市當局繼續調查新光三越百貨公司氣體爆炸原因，被墮下重物擊中重傷的澳門兩歲女童，手術後情況仍然嚴重，主治醫生認為不適宜送回澳門治療。澳門政府派人隨紅十字會到當地支援。而在北京，國台辦向事故中的遇難者表示哀悼，並向家屬以及傷者表達慰問。來自澳門的一家四代七人，在百貨公司門口被跌落的重物擊中，兩人死亡。兩歲女童頭部受創，一度沒有呼吸心跳，在當地兒童醫院進行緊急開顱手術。中醫大兒童醫院神經外科主任鄭宇凱稱：「來的時候發現小朋友嚴重頭部外傷、腦部腫脹，所以我們趕快做了一個緊急手術，目前生命徵象穩定，不過腦部部分還要持續搶救當中。」被問到是否不建議安排回到澳門治療，鄭宇凱回應：「目前都是比較不那麼穩定的狀況，要乘飛機的大家都是不建議。」中醫大兒童醫院副院長周宜卿指出：「腦部受傷的孩子最關鍵期就在這一周，她的腦部會持續腫脹，因細胞受傷。在加護病房的照顧，我們必須做神經保護，因這牽涉神經將來的癒合好不好。」救治女童的醫院指，會提供多方面支援，協助受傷女童的家人，包括有社工團隊跟進心理上的影響。',
+
+'控煙酒辦人員昨晚巡查旺角一間酒吧，向非法吸食水煙的人士發出3張定額罰款通知，又檢走水煙。控煙酒辦更考慮檢控酒吧經營者，將個案轉介酒牌局跟進。控煙酒辦去年多次行動，打擊禁煙區非法吸食水煙，合共發出162張定額罰款通知，並向店員和酒吧、食肆負責人發出89張傳票。法例規定，任何人在禁煙區食煙，包括水煙，即屬違法，可罰款1,500元',
+
+'《彭博》引述消息，蘋果目標最快在五月，為內地iPhone引入人工智能功能，加快進程除需要進行軟件改動，更要極度依賴中國內地合作夥伴。消息指，蘋果目前仍面對中國監管阻礙。中國是蘋果在美國以外最大的市場。近期面對中國手機品牌強勢崛起，蘋果手機在中國的銷量持續下滑。蘋果最近落實與阿里巴巴合作，期望手機的人工智能功能可通過內地監管要求，而百度亦是蘋果的合作夥伴'
+]
+```
+
+五条新闻，几乎是在1s内完成，而且还是使用cpu，结果如下：
+
+```shell
+[[('深圳', 'LOCATION', 0, 1), ('南山', 'LOCATION', 1, 2), ('今日', 'DATE', 2, 3), ('8日', 'DATE', 4, 5), ('2', 'INTEGER', 14, 15), ('深圳', 'LOCATION', 19, 20), ('2月8日', 'DATE', 27, 28), ('10時', 'TIME', 28, 29), ('南山區', 'LOCATION', 32, 33), ('沙河西路', 'LOCATION', 33, 34), ('茶光村公交站', 'LOCATION', 34, 35), ('3名', 'INTEGER', 52, 53), ('2', 'INTEGER', 58, 59), ('0mg/100ml', 'MEASURE', 76, 77)], [('消拯', 'ORGANIZATION', 0, 1), ('8日', 'DATE', 4, 5), ('45岁', 'AGE', 9, 10), ('今年', 'DATE', 24, 25), ('亚罗士打', 'LOCATION', 28, 29), ('第3宗', 'ORDINAL', 29, 30), ('周三', 'DATE', 40, 41), ('8日', 'DATE', 42, 43), ('亚罗士','LOCATION', 45, 46), ('打甘榜哥里基斯拿督坤峇路', 'LOCATION', 46, 47), ('45岁', 'AGE', 55, 56), ('吉打州消拯局', 'ORGANIZATION', 60, 61), ('阿末阿米努丁', 'PERSON', 63, 64), ('消拯局', 'ORGANIZATION', 66, 67), ('周三', 'DATE', 68, 69), ('下午3时04分', 'TIME', 69, 70), ('消拯', 'ORGANIZATION', 87, 88), ('亚罗士', 'LOCATION', 97, 98), ('太平间', 'LOCATION', 99, 100), ('当天', 'DATE', 107, 108), ('下午6时42分', 'TIME', 108, 109), ('下午6时58分', 'TIME', 115, 116), ('晚上7时25分', 'TIME', 127, 128), ('今年', 'DATE', 131, 132), ('隔天', 'DATE', 133, 134), ('1月2日', 'DATE', 135, 136), ('太子路', 'LOCATION', 138, 139), ('港海墘街', 'LOCATION', 140, 141), ('蓝卓公', 'LOCATION', 141, 142), ('28岁', 'AGE', 149, 150), ('华青', 'LOCATION', 150, 151), ('黄伟宏', 'PERSON', 151, 152), ('隔天', 'DATE', 177, 178), ('1月3日', 'DATE', 179, 180), ('上午9时51分', 'TIME', 181, 182), ('400米', 'LENGTH', 185, 186), ('丹绒查里河畔''LOCATION', 188, 189), ('第2宗', 'ORDINAL', 198, 199), ('1月5日', 'DATE', 204, 205), ('45岁', 'AGE', 208, 209), ('当天', 'DATE', 212, 213), ('中午', 'TIME', 213, 214), ('12时', 'TIME', 215, 216), ('米都拉惹路桥', 'LOCATION', 218, 219), ('丹绒查理河畔', 'LOCATION', 220, 221), ('当天', 'DATE', 227, 228), ('下午4时10分', 'TIME', 228, 229)], [('台灣', 'LOCATION', 0, 1), ('台中市', 'LOCATION', 1, 2), ('新光三越百貨公司', 'ORGANIZATION', 5, 6), ('澳門', 'LOCATION', 17, 18), ('兩歲', 'AGE', 18, 19), ('澳門', 'LOCATION', 34, 35), ('澳門', 'LOCATION', 37, 38), ('紅十字會', 'ORGANIZATION', 42, 43), ('北京', 'LOCATION', 49, 50), ('國台辦', 'ORGANIZATION', 51, 52), ('澳門', 'LOCATION', 69, 70), ('四代', 'INTEGER', 72, 73), ('七', 'INTEGER', 73, 74), ('百貨公司', 'ORGANIZATION', 77, 78), ('兩', 'INTEGER', 85, 86), ('兩歲', 'AGE', 89, 90), ('中醫大兒童醫院神經外科', 'ORGANIZATION', 108, 109), ('鄭宇凱', 'PERSON', 110, 111), ('澳門', 'LOCATION', 157, 158), ('鄭宇凱', 'PERSON', 160, 161), ('中醫大兒童醫院', 'ORGANIZATION', 183, 184), ('周宜卿', 'PERSON', 186, 187)], [('控煙酒辦', 'ORGANIZATION', 0, 1), ('昨晚', 'TIME', 2, 3), ('旺角', 'LOCATION', 4, 5), ('3張', 'INTEGER', 16, 17), ('控煙酒辦', 'ORGANIZATION', 26, 27), ('控煙酒辦', 'ORGANIZATION', 39, 40), ('去年', 'DATE', 40, 41), ('多次', 'FREQUENCY', 41, 42), ('162張', 'INTEGER', 52, 53), ('89張', 'INTEGER', 66, 67), ('1,500元', 'MONEY', 87, 88)], [('彭博', 'ORGANIZATION', 1, 2), ('蘋果', 'ORGANIZATION', 6, 7), ('五月', 'DATE', 11, 12), ('中國', 'LOCATION', 32, 33), ('蘋果', 'ORGANIZATION', 40, 41), ('中國', 'LOCATION', 44, 45), ('中國', 'LOCATION', 48, 49), ('蘋果', 'ORGANIZATION', 50, 51), ('美國', 'LOCATION', 52, 53), ('中國', 'LOCATION', 60, 61), ('蘋果', 'ORGANIZATION', 66, 67), ('中國', 'LOCATION', 69, 70), ('蘋果', 'ORGANIZATION', 75, 76), ('阿 
+里巴巴', 'ORGANIZATION', 79, 80), ('百度', 'LOCATION', 94, 95), ('蘋果', 'ORGANIZATION', 97, 98)]]
+```
+
+抽取结果还行吧。
+
+## 2月17日：
+
+### 实验一：尝试将Hanlp集成到kag里面
+
+重写KAG的extractor：
+
+```python
+ #格式转换器
+    def convert_to_new_format(self,data):
+        """
+        将原始格式 [[('Pema', 'ORGANIZATION', 5, 6), ('Khandu', 'ORGANIZATION', 6, 7), ...]]
+        转换为 [{'name': 'Pema', 'type': 'ORGANIZATION', 'category': 'ORGANIZATION', 'description': ''}, ...]
+        """
+        # 确保输入是列表的列表
+        if not data or not isinstance(data[0], list):
+            raise ValueError("输入数据格式不正确，应为嵌套列表形式")
+
+        # 提取内部列表
+        entities = data[0]
+
+        # 转换为新格式
+        result = []
+        for entity in entities:
+            name, entity_type, start, end = entity  # 解包元组
+            result.append({
+                'name': name,
+                'type': entity_type,
+                'category': entity_type,
+                'description': ''
+            })
+
+        return result
+    @retry(stop=stop_after_attempt(3))#使用重试机制，最多重试 3 次，函数执行失败时自动重试
+    def named_entity_recognition(self, passage: str):
+        """
+        Performs named entity recognition on a given text passage.
+        Args:
+            passage (str): 输入文本段落.
+        Returns:
+            合并去重后的实体列表，每个实体包含名称、类型、类别和描述.
+        """
+        """
+        LLM返回示例:[{'name':'','type':'','category':'','description':''},{'name':'','type':'','category':'','description':''}]
+        hanlp返回示例:[[('Pema', 'ORGANIZATION', 5, 6), ('Khandu', 'ORGANIZATION', 6, 7), ('PTI', 'ORGANIZATION', 10, 11)]]
+        """
+        
+        # 语种见名称最后一个字段或相应语料库
+        tok = hanlp.load(hanlp.pretrained.tok.COARSE_ELECTRA_SMALL_ZH)
+        ner = hanlp.load(hanlp.pretrained.ner.MSRA_NER_ELECTRA_SMALL_ZH)
+        tok_out=tok([passage])
+        ner_out=ner(tok_out)
+        #将Hanlp返回格式变成标准格式
+        ner_result = self.convert_to_new_format(ner_out)
+        print(ner_result)
+        # ner_result = self.llm.invoke({"input": passage}, self.ner_prompt)#传入passage和prompt
+        
+
+        if self.external_graph: #调用外部图补充实体
+            extra_ner_result = self.external_graph.ner(passage)
+        else:
+            extra_ner_result = []
+
+        #处理外部图返回的实体，外部图优先级更高，
+        output = []
+        dedup = set()#使用 dedup 集合记录已处理的实体名称，避免重复添加,但是这种去重是严格按照字符进行去重，并不合理。
+        for item in extra_ner_result:
+            name = item.name
+            label = item.label
+            description = item.properties.get("desc", "")
+            semantic_type = item.properties.get("semanticType", label)
+            if name not in dedup:
+                dedup.add(name)
+                output.append(
+                    {
+                        "name": name,
+                        "type": semantic_type,
+                        "category": label,
+                        "description": description,
+                    }
+                )
+        #处理LLM返回的实体
+        for item in ner_result:
+            name = item.get("name", None)
+            if name and name not in dedup:
+                dedup.add(name)
+                output.append(item)
+        
+        return output
+```
+
+这里只更改了命名实体识别那一部分的源码，没有更改实体对齐和实体关系抽取的代码，看看结果：
+
+![graph (25)](./assets/graph (25).svg)
+
+Done process 10 records, with 9 successfully processed and 1 failures encountered.(10篇新闻成功了9篇，因为后续有两个步骤要调用大模型，而有一个新闻含有一些暴力内容，被大模型拒绝回答了)
+
+可以看到很多被抽取出来的实体，其实用处很小，仔细看的话，能发现很多错误（实体类别问题）：
+
+![graph (26)](./assets/graph (26).svg)
+
+
+
+总结就是，实体抽取这一块，如果对象是新闻这种比较复杂的样例，不用大模型是很难保证抽取质量的。传统神经网络虽然也可以抽取，但是需要为项目制作数据集，重新训练一遍参数才行。
+
+### 
+
+
+
+
+
+
+
+
+
+
 
