@@ -14,7 +14,8 @@ from kag.builder.component.external_graph.external_graph import (
     DefaultExternalGraphLoader,
 )
 from kag.builder.component.extractor.schema_free_extractor import SchemaFreeExtractor
-from kag.builder.component.extractor.schema_Dawn_extractor import SchemaDawnExtractor
+from kag.builder.component.extractor.schema_Dawn_Hanlp_extractor import SchemaDawnHanlpExtractor
+from kag.builder.component.extractor.schema_remove_extractor import SchemaRemoveExtractor
 from kag.builder.component.extractor.schema_constraint_extractor import (
     SchemaConstraintExtractor,
 )
@@ -26,6 +27,7 @@ from kag.builder.component.mapping.spg_type_mapping import SPGTypeMapping
 from kag.builder.component.mapping.relation_mapping import RelationMapping
 from kag.builder.component.mapping.spo_mapping import SPOMapping
 from kag.builder.component.scanner.csv_scanner import CSVScanner
+from kag.builder.component.scanner.xlsx_scanner import XLSXScanner
 from kag.builder.component.scanner.json_scanner import JSONScanner
 from kag.builder.component.scanner.yuque_scanner import YuqueScanner
 from kag.builder.component.scanner.dataset_scanner import (
@@ -56,7 +58,8 @@ from kag.builder.component.writer.kg_writer import KGWriter
 __all__ = [
     "DefaultExternalGraphLoader",
     "SchemaFreeExtractor",
-    "SchemaDawnExtractor",
+    "SchemaDawnHanlpExtractor",#hanlp集成
+    "SchemaRemoveExtractor",#kag改进实验
     "SchemaConstraintExtractor",
     "KAGAligner",
     "SPGAligner",
@@ -72,6 +75,7 @@ __all__ = [
     "MixReader",
     "DictReader",
     "JSONScanner",
+    "XLSXScanner",#xlsx格式文件读取
     "HotpotqaCorpusScanner",
     "MusiqueCorpusScanner",
     "FileScanner",

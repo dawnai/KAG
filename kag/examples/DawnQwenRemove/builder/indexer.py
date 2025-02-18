@@ -30,6 +30,6 @@ if __name__ == "__main__":
     import_modules_from_path("./prompt")#记得使用自己的prompt模板
     dir_path = os.path.dirname(__file__)
     # 将file_path设置为之前准备好的语料文件路径
-    file_path = os.path.join(dir_path, "data/test.xlsx")
+    file_path = os.path.join(dir_path, "data/data.json")
 
     buildKB(file_path)

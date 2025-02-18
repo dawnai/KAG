@@ -31,9 +31,9 @@ from knext.schema.client import SchemaClient
 logger = logging.getLogger(__name__)#初始化日志记录器
 
 
-@ExtractorABC.register("schema_Dawn")
-@ExtractorABC.register("schema_Dawn_extractor")
-class SchemaDawnExtractor(ExtractorABC):
+@ExtractorABC.register("schema_Dawn_Hanlp")
+@ExtractorABC.register("schema_Dawn_Hanlp_extractor")
+class SchemaDawnHanlpExtractor(ExtractorABC):
     """
     A class for extracting knowledge graph subgraphs from text using a large language model (LLM).
     Inherits from the Extractor base class.

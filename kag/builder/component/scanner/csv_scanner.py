@@ -34,11 +34,11 @@ class CSVScanner(ScannerABC):
         self.col_ids = col_ids
 
     @property
-    def input_types(self) -> Input:
+    def input_types(self) -> Input:#输入类型为字符串（文件路径）
         return str
 
     @property
-    def output_types(self) -> Output:
+    def output_types(self) -> Output:#输出类型为字典
         return Dict
 
     def load_data(self, input: Input, **kwargs) -> List[Output]:
@@ -52,7 +52,7 @@ class CSVScanner(ScannerABC):
         Returns:
             List[Output]: A list of dictionaries containing the processed data.
         """
-        input = self.download_data(input)
+        input = self.download_data(input)#预处理输入路径，可以是一个 URL 或本地路径
         if self.header:
             data = pd.read_csv(input, dtype=str)
         else:
@@ -70,5 +70,5 @@ class CSVScanner(ScannerABC):
                     contents.append(
                         {"id": generate_hash_id(v), "name": name, "content": v}
                     )
-
+        
         return contents

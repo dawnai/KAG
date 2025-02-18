@@ -28,7 +28,7 @@ chat_llm: &chat_llm
 #use for embedding (Retrieval)
 vectorize_model: &vectorize_model
   api_key: EMPTY
-  base_url: http://172.20.239.139:11434/v1
+  base_url: http://172.20.250.18:11434/v1
   model: bge-m3
   type: openai
   vector_dimensions: 1024
@@ -42,7 +42,7 @@ log:
 
 project:
   biz_scene: default
-  host_addr: http://172.20.239.139:8887
+  host_addr: http://172.20.250.18:8887
   id: '3'
   language: zh
   namespace: DawnQwenHongKong #the name of project
@@ -54,7 +54,7 @@ kag_builder_pipeline:
   chain:
     type: unstructured_builder_chain # kag.builder.default_chain.DefaultUnstructuredBuilderChain
     extractor:
-      type: schema_Dawn_extractor # kag.builder.component.extractor.schema_free_extractor.SchemaFreeExtractor
+      type: schema_remove_extractor # kag.builder.component.extractor.schema_free_extractor.SchemaFreeExtractor
       llm: *openie_llm
                        #使用deepseek
       ner_prompt:
@@ -70,7 +70,7 @@ kag_builder_pipeline:
       similarity_threshold: 0.9
     splitter:
       type: length_splitter # kag.builder.component.splitter.length_splitter.LengthSplitter
-      split_length: 100000
+      split_length: 10000
       window_length: 0
     vectorizer:
       type: batch_vectorizer # kag.builder.component.vectorizer.batch_vectorizer.BatchVectorizer
@@ -80,7 +80,7 @@ kag_builder_pipeline:
   num_threads_per_chain: 1
   num_chains: 16
   scanner:
-    type: csv_scanner # kag.builder.component.scanner.dataset_scanner.MusiqueCorpusScanner
+    type: xlsx_scanner # kag.builder.component.scanner.dataset_scanner.MusiqueCorpusScanner
 #------------kag-builder configuration end----------------#
 
 #------------kag-solver configuration start----------------#
