@@ -4,6 +4,7 @@ from kag.interface import ScannerABC
 from kag.common.utils import generate_hash_id
 from knext.common.base.runnable import Input, Output
 import os
+import math
 import re
 @ScannerABC.register("xlsx")
 @ScannerABC.register("xlsx_scanner")
@@ -29,6 +30,9 @@ class XLSXScanner(ScannerABC):
         """
         清洗文本，去除无关字符和多余空格。
         """
+        if text is None or (isinstance(text, float) and math.isnan(text)):
+            return ""  # 如果 text 是 None 或 nan，返回空字符串
+        
         # 替换中文空格（\u3000）和其他特殊空白符为普通空格
         text = re.sub(r'\s+', ' ', text)
         # 去除多余的换行符和制表符
@@ -80,6 +84,8 @@ class XLSXScanner(ScannerABC):
         for _, row in data.iterrows():
             title = row["title"]
             content = row["content"]
+            if content == '':
+                print('fuck')
             contents.append(
                 {
                     "id": generate_hash_id(content),  # 使用 content 生成哈希 ID

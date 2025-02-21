@@ -16,7 +16,7 @@ chat_llm: &chat_llm
 #use for embedding (Retrieval)
 vectorize_model: &vectorize_model
   api_key: EMPTY
-  base_url: http://172.20.250.18:11434/v1
+  base_url: http://172.20.158.20:11434/v1
   model: bge-m3
   type: openai
   vector_dimensions: 1024
@@ -30,10 +30,10 @@ log:
 
 project:
   biz_scene: default
-  host_addr: http://172.20.250.18:8887 
+  host_addr: http://172.20.158.20:8887
   id: "1"
   language: zh
-  namespace: DawnQwenRemove #the name of project
+  namespace: DawnQwen5W1H #the name of project
 #------------project configuration end----------------#
 
 #------------kag-builder configuration start----------------#

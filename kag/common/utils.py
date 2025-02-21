@@ -233,12 +233,13 @@ def generate_hash_id(value):
         sorted_items = sorted(value.items())
         key = str(sorted_items)
     else:
-        key = value
+        key = str(value)  # 确保 key 是字符串
+
     if isinstance(key, str):
-        key = key.encode("utf-8")
+        key = key.encode("utf-8")  # 确保 key 是字节串
+
     hasher = hashlib.sha256()
     hasher.update(key)
-
     return hasher.hexdigest()
 
 
